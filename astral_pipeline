@@ -1,0 +1,38 @@
+ASTRAL
+
+#Align
+
+awk '{print "mafft",$1".faa",">",$1".aligned.faa"}' 26_align.sh > 26_aligner.sh
+
+module load mafft/7.471
+
+mafft OG0003652.faa > OG0003652.aligned.faa
+
+..
+
+#Fasttree
+
+awk '{print "fasttree",$1".aligned.faa",">>","26.tre"}' orthos.txt > 26_fasttree.sh
+
+Conda activate fasttree
+
+fasttree OG0003652.aligned.faa >> 16.tre
+...
+
+
+Renaming
+
+#!/bin/bash
+readarray list < alignments.txt
+for i in ${list[@]}
+  do
+  cat $i | awk -F \| '{print $1,$2}' > ${i/.aligned.fa/.aln}
+  wait
+done
+
+
+#ASTRAL
+
+module load java/14
+
+java -jar ../../Astral/astral.5.7.5.jar -i 16.tre -o 16.astral.tre 2>16astral.log
